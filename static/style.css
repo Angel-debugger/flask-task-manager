@@ -1,0 +1,41 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    padding: 20px;
+}
+.container {
+    background-color: #fff;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #ccc;
+}
+h1 {
+    text-align: center;
+}
+.task-list {
+    list-style-type: none;
+    padding: 0;
+}
+.task-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+.task-list li.completed {
+    text-decoration: line-through;
+    color: gray;
+}
+a {
+    margin-left: 10px;
+    text-decoration: none;
+    color: blue;
+}
+.btn {
+    display: inline-block;
+    margin-bottom: 15px;
+    padding: 5px 10px;
+    background-color: #2196f3;
+    color: white;
+    border-radius: 5px;
+}
