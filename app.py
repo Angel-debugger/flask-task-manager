@@ -1,14 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 import os
 
 app = Flask(__name__)
 
-# PostgreSQL from Render
+# Get PostgreSQL URL from Render
 database_url = os.environ.get("DATABASE_URL")
 
-# Fix Render postgres:// issue
+# Fix postgres:// -> postgresql:// (Render quirk)
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
@@ -16,16 +15,21 @@ app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 
 # Database Model
 class Task(db.Model):
+    __tablename__ = "tasks"
+
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<Task {self.title}>"
+
+# ✅ AUTO-CREATE TABLES IF THEY DON'T EXIST (SAFE)
+with app.app_context():
+    db.create_all()
 
 @app.route("/")
 def index():
