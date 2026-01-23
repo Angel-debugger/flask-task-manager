@@ -1,18 +1,22 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import os
 
 app = Flask(__name__)
 
-# Ensure instance folder exists (RENDER SAFE)
-basedir = os.path.abspath(os.path.dirname(__file__))
-instance_path = os.path.join(basedir, "instance")
-os.makedirs(instance_path, exist_ok=True)
+# PostgreSQL from Render
+database_url = os.environ.get("DATABASE_URL")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(instance_path, "tasks.db")
+# Fix Render postgres:// issue
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 # Database Model
 class Task(db.Model):
@@ -22,10 +26,6 @@ class Task(db.Model):
 
     def __repr__(self):
         return f"<Task {self.title}>"
-
-# ✅ CREATE TABLES AT STARTUP (FLASK 3 SAFE)
-with app.app_context():
-    db.create_all()
 
 @app.route("/")
 def index():
