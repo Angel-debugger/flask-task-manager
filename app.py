@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Ensure instance folder exists (CRITICAL for Render)
+# Ensure instance folder exists (RENDER SAFE)
 basedir = os.path.abspath(os.path.dirname(__file__))
 instance_path = os.path.join(basedir, "instance")
 os.makedirs(instance_path, exist_ok=True)
@@ -14,7 +14,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# Database Model (MUST be before create_all)
+# Database Model
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
@@ -23,8 +23,9 @@ class Task(db.Model):
     def __repr__(self):
         return f"<Task {self.title}>"
 
-# Create tables AFTER models are defined
-with app.app_context():
+# ✅ CREATE TABLES AT FIRST REQUEST (GUNICORN SAFE)
+@app.before_first_request
+def create_tables():
     db.create_all()
 
 @app.route("/")
