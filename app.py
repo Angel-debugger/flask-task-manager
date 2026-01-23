@@ -4,29 +4,28 @@ import os
 
 app = Flask(__name__)
 
-# ✅ Ensure instance folder exists (Render-safe)
+# Ensure instance folder exists (Render needs this)
 os.makedirs(app.instance_path, exist_ok=True)
 
-# ✅ Correct database path
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + 
+os.path.join(app.instance_path, 'tasks.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# -------------------- MODEL --------------------
+# Database Model
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
-        return f"<Task {self.title}>"
+        return f'<Task {self.title}>'
 
-# -------------------- CREATE TABLES --------------------
+# ✅ CREATE TABLES AFTER MODEL DEFINITION
 with app.app_context():
     db.create_all()
 
-# -------------------- ROUTES --------------------
 @app.route('/')
 def index():
     tasks = Task.query.all()
@@ -37,7 +36,8 @@ def add_task():
     if request.method == 'POST':
         title = request.form['title']
         if title.strip():
-            db.session.add(Task(title=title))
+            new_task = Task(title=title)
+            db.session.add(new_task)
             db.session.commit()
             return redirect(url_for('index'))
     return render_template('add_task.html')
@@ -55,3 +55,8 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
     return redirect(url_for('index'))
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
