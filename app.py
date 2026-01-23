@@ -23,9 +23,8 @@ class Task(db.Model):
     def __repr__(self):
         return f"<Task {self.title}>"
 
-# ✅ CREATE TABLES AT FIRST REQUEST (GUNICORN SAFE)
-@app.before_first_request
-def create_tables():
+# ✅ CREATE TABLES AT STARTUP (FLASK 3 SAFE)
+with app.app_context():
     db.create_all()
 
 @app.route("/")
