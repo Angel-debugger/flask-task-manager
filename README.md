@@ -14,13 +14,26 @@ A simple task manager web application built with Flask and SQLite.
 - Flask-SQLAlchemy
 - HTML/CSS
 
-## How to Run Locally
+## Run Locally
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 python app.py
+```
 
-Author
-Angela Ben-Ushie
+
+**What I Learned**
+
+- Flask routing and templates
+
+- SQLAlchemy models and queries
+
+- Deploying Flask apps with Gunicorn
+
+- Handling database persistence on cloud platforms
+
+**Author**
+
+**Angela Ben-Ushie**
